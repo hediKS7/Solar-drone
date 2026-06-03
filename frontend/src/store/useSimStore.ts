@@ -142,19 +142,31 @@ export const useSimStore = create<SimState>((set, get) => ({
 
   runSimulation: async () => {
     // Prevent multiple simultaneous runs
-    if (get().loading) return;
+    const state = get();
+    if (state.loading) return;
+
+    set({ loading: true });
     try {
-      const { battery, solar, mission, environment, lca } = get();
-      const response = await fetch('http://localhost:8000/simulate', {
+      const { battery, solar, mission, environment, lca } = state;
+      
+      // Use relative URL or environment variable for flexibility
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
+      const response = await fetch(`${baseUrl}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ battery, solar, mission, environment, lca }),
       });
-      if (!response.ok) throw new Error('Simulation failed');
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        throw new Error(errorData.detail || 'Simulation failed');
+      }
+
       const data = await response.json();
       set({ result: data, loading: false });
     } catch (error) {
-      console.error(error);
+      console.error('Simulation Error:', error);
       set({ loading: false });
     }
   },
