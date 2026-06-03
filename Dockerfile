@@ -2,7 +2,9 @@
 FROM node:20-slim AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm install
+# Use clean install with reduced network overhead and higher timeout
+RUN npm config set fetch-retry-maxtimeout 120000 && \
+    npm install --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
