@@ -1,5 +1,5 @@
 # --- Stage 1: Build Frontend ---
-FROM node:20-alpine AS frontend-builder
+FROM node:20-slim AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
@@ -9,11 +9,13 @@ RUN npm run build
 # --- Stage 2: Final Image ---
 FROM python:3.12-slim
 
-# Install Node.js for the frontend runtime
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y height build-essential nodejs && \
-    rm -rf /var/lib/apt/lists/*
+# Install Node.js and build tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
