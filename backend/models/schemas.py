@@ -88,3 +88,10 @@ class SimulationResponse(BaseModel):
     time_series: List[TimeStep]
     lca_metrics: LCAMetrics
     summary: dict
+
+class AIAnalysisRequest(BaseModel):
+    request: SimulationRequest
+    results: SimulationResponse
+
+class AIAnalysisResponse(BaseModel):
+    analysis: str

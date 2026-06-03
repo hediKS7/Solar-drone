@@ -10,7 +10,9 @@ import {
   Sun, 
   TrendingDown,
   AlertCircle,
-  Leaf
+  Leaf,
+  Sparkles,
+  Brain
 } from 'lucide-react'
 import {
   ResponsiveContainer,
@@ -21,13 +23,14 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  LineChart,
-  Line,
+  Line
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import ReactMarkdown from 'react-markdown'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export const Dashboard = () => {
-  const { result, loading } = useSimStore()
+  const { result, loading, aiAnalysis, isAnalyzing } = useSimStore()
 
   if (loading) {
     return (
@@ -63,7 +66,7 @@ export const Dashboard = () => {
   }))
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-background/50">
+    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-background/50 custom-scrollbar">
       {/* Top KPI Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard 
@@ -194,36 +197,80 @@ export const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Environmental Impact Summary */}
-      <Card className="border-none bg-card/40 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Leaf className="w-5 h-5 text-emerald-500" />
-            Environmental Impact (LCA)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-4">
-                 <div className="flex justify-between items-center p-3 rounded-lg bg-background/40">
-                    <span className="text-sm text-muted-foreground">CO₂ Footprint (No Solar)</span>
-                    <span className="font-bold">{result.lca_metrics.co2_no_solar} kg</span>
-                 </div>
-                 <div className="flex justify-between items-center p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                    <span className="text-sm text-emerald-400 font-medium">CO₂ Footprint (With Solar)</span>
-                    <span className="font-bold text-emerald-400">{result.lca_metrics.co2_with_solar} kg</span>
-                 </div>
-                 <p className="text-xs text-muted-foreground italic">
-                   * Based on 500 mission cycles and Tunisia grid emission factors.
-                 </p>
-              </div>
-              <div className="flex flex-col items-center justify-center p-6 border border-dashed rounded-xl">
-                 <h4 className="text-4xl font-black text-emerald-500">-{result.lca_metrics.reduction_pct}%</h4>
-                 <p className="text-sm font-medium uppercase tracking-tighter text-muted-foreground mt-2">Carbon Reduction</p>
-              </div>
-           </div>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Environmental Impact Summary */}
+        <Card className="xl:col-span-1 border-none bg-card/40 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Leaf className="w-5 h-5 text-emerald-500" />
+              Environmental Impact (LCA)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+             <div className="space-y-6">
+                <div className="space-y-4">
+                   <div className="flex justify-between items-center p-3 rounded-lg bg-background/40 border border-white/5">
+                      <span className="text-sm text-muted-foreground">CO₂ Footprint (No Solar)</span>
+                      <span className="font-bold">{result.lca_metrics.co2_no_solar} kg</span>
+                   </div>
+                   <div className="flex justify-between items-center p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <span className="text-sm text-emerald-400 font-medium">CO₂ Footprint (With Solar)</span>
+                      <span className="font-bold text-emerald-400">{result.lca_metrics.co2_with_solar} kg</span>
+                   </div>
+                </div>
+                <div className="flex flex-col items-center justify-center p-6 border border-dashed border-white/10 rounded-xl bg-white/5">
+                   <h4 className="text-4xl font-black text-emerald-500">-{result.lca_metrics.reduction_pct}%</h4>
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mt-2">Carbon Reduction</p>
+                </div>
+             </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Insights Card */}
+        <Card className="xl:col-span-2 border-none bg-gradient-to-br from-indigo-500/10 to-solar/10 backdrop-blur-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Brain size={120} className="text-white" />
+          </div>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2 text-white">
+              <Sparkles className="w-5 h-5 text-solar animate-pulse" />
+              AI Mission Intelligence
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10 min-h-[250px]">
+            <AnimatePresence mode="wait">
+              {isAnalyzing ? (
+                <motion.div 
+                  key="analyzing"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-center justify-center h-48 gap-4"
+                >
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full bg-solar/20 animate-ping absolute inset-0" />
+                    <Brain className="w-12 h-12 text-solar relative z-10" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground animate-pulse tracking-widest uppercase">Mistral AI is processing mission data...</p>
+                </motion.div>
+              ) : aiAnalysis ? (
+                <motion.div 
+                  key="analysis"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="prose prose-invert prose-sm max-w-none prose-headings:text-solar prose-headings:mb-2 prose-headings:mt-4 prose-p:text-white/80 prose-p:leading-relaxed prose-strong:text-white"
+                >
+                  <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+                </motion.div>
+              ) : (
+                <div className="flex items-center justify-center h-48">
+                  <p className="text-sm text-muted-foreground italic">Simulation results ready for AI analysis.</p>
+                </div>
+              )}
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

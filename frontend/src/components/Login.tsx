@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Wind, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react'
+import { Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Logo } from './Logo'
 
 export const Login = () => {
   const { login } = useSimStore()
@@ -57,12 +58,10 @@ export const Login = () => {
           
           <CardHeader className="pt-8 pb-6 text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-2xl bg-solar flex items-center justify-center shadow-[0_0_30px_rgba(244,211,94,0.3)]">
-                <Wind className="text-solar-dark w-10 h-10" />
-              </div>
+              <Logo size={64} className="shadow-[0_0_30px_rgba(244,211,94,0.3)]" />
             </div>
-            <CardTitle className="text-2xl font-bold tracking-tight text-white">SolarDrone Pro</CardTitle>
-            <CardDescription className="text-muted-foreground mt-1 text-base">
+            <CardTitle className="text-2xl font-bold tracking-tight text-white uppercase">SOLARDRONE PRO</CardTitle>
+            <CardDescription className="text-muted-foreground mt-1 text-base font-medium tracking-wide">
               Precision Simulation Interface
             </CardDescription>
           </CardHeader>

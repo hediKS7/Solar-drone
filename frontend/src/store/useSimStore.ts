@@ -82,6 +82,8 @@ interface SimState {
   lca: LCAConfig;
   result: SimResult | null;
   loading: boolean;
+  isAnalyzing: boolean;
+  aiAnalysis: string | null;
   isAuthenticated: boolean;
   userEmail: string | null;
   
@@ -91,6 +93,7 @@ interface SimState {
   setEnvironment: (config: Partial<EnvironmentalConfig>) => void;
   setLca: (config: Partial<LCAConfig>) => void;
   runSimulation: () => Promise<void>;
+  analyzeResults: () => Promise<void>;
   login: (email: string) => void;
   logout: () => void;
 }
@@ -137,6 +140,8 @@ export const useSimStore = create<SimState>((set, get) => ({
   },
   result: null,
   loading: false,
+  isAnalyzing: false,
+  aiAnalysis: null,
   isAuthenticated: false,
   userEmail: null,
 
@@ -156,22 +161,16 @@ export const useSimStore = create<SimState>((set, get) => ({
   setLca: (config) => set((state) => ({ lca: { ...state.lca, ...config } })),
 
   login: (email: string) => set({ isAuthenticated: true, userEmail: email }),
-  logout: () => set({ isAuthenticated: false, userEmail: null }),
+  logout: () => set({ isAuthenticated: false, userEmail: null, result: null, aiAnalysis: null }),
 
   runSimulation: async () => {
     const state = get();
-    // Use a small delay or check to ensure we don't spam, 
-    // but the debounce in page.tsx already handles most of this.
-    
-    set({ loading: true });
+    set({ loading: true, aiAnalysis: null });
     try {
       const { battery, solar, mission, environment, lca } = state;
       const payload = { battery, solar, mission, environment, lca };
       
-      console.log('Running Simulation with payload:', payload);
-      
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      
       const response = await fetch(`${baseUrl}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,12 +183,41 @@ export const useSimStore = create<SimState>((set, get) => ({
       }
 
       const data = await response.json();
-      // Add a timestamp to force update if needed, though Zustand handles object changes
       set({ result: { ...data, _ts: Date.now() }, loading: false });
-      console.log('Simulation complete. Results updated.');
+      
+      // Automatically trigger AI analysis
+      get().analyzeResults();
     } catch (error) {
       console.error('Simulation Error:', error);
       set({ loading: false });
     }
   },
+
+  analyzeResults: async () => {
+    const { result, battery, solar, mission, environment, lca } = get();
+    if (!result) return;
+
+    set({ isAnalyzing: true });
+    try {
+      const payload = {
+        request: { battery, solar, mission, environment, lca },
+        results: result
+      };
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${baseUrl}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error('AI Analysis failed');
+
+      const data = await response.json();
+      set({ aiAnalysis: data.analysis, isAnalyzing: false });
+    } catch (error) {
+      console.error('AI Analysis Error:', error);
+      set({ isAnalyzing: false, aiAnalysis: 'Failed to generate AI insights. Please check your connection.' });
+    }
+  }
 }));
