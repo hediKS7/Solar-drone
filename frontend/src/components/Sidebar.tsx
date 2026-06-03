@@ -16,16 +16,33 @@ export const Sidebar = () => {
     solar, setSolar, 
     environment, setEnvironment,
     mission, setMission,
-    runSimulation, loading 
+    runSimulation, loading,
+    userEmail, logout
   } = useSimStore()
 
   return (
     <div className="w-80 h-full overflow-y-auto border-r bg-card/50 backdrop-blur-md p-4 flex flex-col gap-6">
-      <div className="flex items-center gap-2 px-2">
-        <div className="w-8 h-8 rounded-lg bg-solar flex items-center justify-center">
-          <Wind className="text-solar-dark w-5 h-5" />
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-solar flex items-center justify-center shadow-[0_0_15px_rgba(244,211,94,0.3)]">
+            <Wind className="text-solar-dark w-5 h-5" />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight">SolarDrone Pro</h1>
         </div>
-        <h1 className="text-xl font-bold tracking-tight">SolarDrone Pro</h1>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-muted-foreground hover:text-solar hover:bg-solar/10"
+          onClick={logout}
+          title="Logout"
+        >
+          <Lock className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <div className="px-2 py-1 bg-white/5 rounded-lg border border-white/10">
+        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Authenticated User</p>
+        <p className="text-xs font-medium text-solar truncate">{userEmail}</p>
       </div>
 
       <Tabs defaultValue="battery" className="w-full">

@@ -82,6 +82,8 @@ interface SimState {
   lca: LCAConfig;
   result: SimResult | null;
   loading: boolean;
+  isAuthenticated: boolean;
+  userEmail: string | null;
   
   setBattery: (config: Partial<BatteryConfig>) => void;
   setSolar: (config: Partial<SolarConfig>) => void;
@@ -89,6 +91,8 @@ interface SimState {
   setEnvironment: (config: Partial<EnvironmentalConfig>) => void;
   setLca: (config: Partial<LCAConfig>) => void;
   runSimulation: () => Promise<void>;
+  login: (email: string) => void;
+  logout: () => void;
 }
 
 export const useSimStore = create<SimState>((set, get) => ({
@@ -133,6 +137,8 @@ export const useSimStore = create<SimState>((set, get) => ({
   },
   result: null,
   loading: false,
+  isAuthenticated: false,
+  userEmail: null,
 
   setBattery: (config) => set((state) => {
     const newBattery = { ...state.battery, ...config };
@@ -148,6 +154,9 @@ export const useSimStore = create<SimState>((set, get) => ({
   setMission: (mission) => set({ mission }),
   setEnvironment: (config) => set((state) => ({ environment: { ...state.environment, ...config } })),
   setLca: (config) => set((state) => ({ lca: { ...state.lca, ...config } })),
+
+  login: (email: string) => set({ isAuthenticated: true, userEmail: email }),
+  logout: () => set({ isAuthenticated: false, userEmail: null }),
 
   runSimulation: async () => {
     const state = get();
