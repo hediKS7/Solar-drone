@@ -22,7 +22,6 @@ def health_check():
 @app.post("/simulate", response_model=SimulationResponse)
 def simulate(request: SimulationRequest):
     try:
-        print(f"Received Simulation Request: Battery S={request.battery.n_series}, P={request.battery.n_parallel}, Capacity={request.battery.q_nom}Ah")
         simulator = DroneSimulator(request)
         result = simulator.run()
         return result

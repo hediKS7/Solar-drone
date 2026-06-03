@@ -27,8 +27,15 @@ class BatteryEngine:
         """
         ocv = self.get_ocv(soc)
         
+        # Scale resistances and capacitance based on pack configuration
+        # R_pack = R_cell * n_series / n_parallel
+        # C_pack = C_cell * n_parallel / n_series
+        r0_pack = self.config.r0 * self.config.n_series / self.config.n_parallel
+        r1_pack = self.config.r1 * self.config.n_series / self.config.n_parallel
+        c1_pack = self.config.c1 * self.config.n_parallel / self.config.n_series
+
         # Solve quadratic: R0*I^2 - (OCV - V_RC)*I + P = 0
-        a = self.config.r0
+        a = r0_pack
         b = -(ocv - v_rc)
         c = p_bat
         
@@ -37,16 +44,18 @@ class BatteryEngine:
             discriminant = 0
             
         # Physical root
-        i_bat = (-b - np.sqrt(discriminant)) / (2*a)
+        i_bat = (-b - np.sqrt(discriminant)) / (2*a) if a > 0 else (p_bat / b if b != 0 else 0)
         
-        v_bat = ocv - self.config.r0 * i_bat - v_rc
+        v_bat = ocv - r0_pack * i_bat - v_rc
         
         # Update states
-        q_nom_c = self.config.q_nom * 3600
-        dv_rc = (i_bat / self.config.c1 - v_rc / (self.config.r1 * self.config.c1)) * dt
+        # Total capacity Q_pack = Q_cell * n_parallel
+        q_nom_pack_c = self.config.q_nom * self.config.n_parallel * 3600
+        
+        dv_rc = (i_bat / c1_pack - v_rc / (r1_pack * c1_pack)) * dt if (r1_pack * c1_pack) > 0 else 0
         new_v_rc = v_rc + dv_rc
         
-        new_soc = soc - (i_bat * dt) / q_nom_c
+        new_soc = soc - (i_bat * dt) / q_nom_pack_c
         new_soc = np.clip(new_soc, 0.0, 1.0)
         
         return {

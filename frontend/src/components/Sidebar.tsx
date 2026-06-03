@@ -121,8 +121,11 @@ export const Sidebar = () => {
                        value={phase.durationMin} 
                        className="h-8 text-xs"
                        onChange={(e) => {
-                         const newMission = [...mission]
-                         newMission[idx].durationMin = parseFloat(e.target.value)
+                         const val = parseFloat(e.target.value)
+                         if (isNaN(val)) return
+                         const newMission = mission.map((p, i) => 
+                           i === idx ? { ...p, durationMin: val } : p
+                         )
                          setMission(newMission)
                        }}
                      />
@@ -134,8 +137,11 @@ export const Sidebar = () => {
                        value={phase.powerW} 
                        className="h-8 text-xs"
                        onChange={(e) => {
-                         const newMission = [...mission]
-                         newMission[idx].powerW = parseFloat(e.target.value)
+                         const val = parseFloat(e.target.value)
+                         if (isNaN(val)) return
+                         const newMission = mission.map((p, i) => 
+                           i === idx ? { ...p, powerW: val } : p
+                         )
                          setMission(newMission)
                        }}
                      />

@@ -21,8 +21,10 @@ class SolarEngine:
             dt: Time step in seconds
             d_v: Voltage perturbation step
         """
-        # Solar panel model
-        i_sc = self.config.i_sc_stc * (g / 1000.0)
+        # Solar panel model using Area and Efficiency
+        # i_sc at STC = (1000 * Area * Efficiency) / V_oc_stc
+        i_sc_stc_eff = (1000.0 * self.config.a_panel * self.config.eta_panel) / self.config.v_oc_stc
+        i_sc = i_sc_stc_eff * (g / 1000.0)
         v_oc = self.config.v_oc_stc * (1 + 0.00025 * (g - 1000))
         
         # Current at V_ref (simplified linear/polynomial model)
