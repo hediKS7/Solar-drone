@@ -13,14 +13,13 @@ class BatteryEngine:
         self.ocv_table_per_cell = np.array([3.0, 3.2, 3.3, 3.4, 3.475, 3.55,
                                             3.625, 3.7, 3.8, 3.95, 4.2])
         
-        # Scale for the whole pack
-        self.ocv_table = self.ocv_table_per_cell * self.config.n_series
-        
-        self.ocv_interp = interp1d(self.soc_table, self.ocv_table, kind='cubic',
-                                   bounds_error=False, fill_value=(self.ocv_table[0], self.ocv_table[-1]))
-
     def get_ocv(self, soc: float) -> float:
-        return float(self.ocv_interp(np.clip(soc, 0, 1)))
+        # Scale for the whole pack dynamically based on current config
+        ocv_table = self.ocv_table_per_cell * self.config.n_series
+        ocv_interp = interp1d(self.soc_table, ocv_table, kind='cubic',
+                                   bounds_error=False, fill_value=(ocv_table[0], ocv_table[-1]))
+        return float(ocv_interp(np.clip(soc, 0, 1)))
+
 
     def simulate_step(self, p_bat: float, soc: float, v_rc: float, dt: float):
         """
