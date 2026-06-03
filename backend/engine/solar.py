@@ -2,15 +2,24 @@ import numpy as np
 from backend.models.schemas import SolarConfig
 
 class SolarEngine:
+    """
+    Simulates a solar panel with a Perturb & Observe (P&O) MPPT controller.
+    """
     def __init__(self, config: SolarConfig):
         self.config = config
+        # Initial guess: MPP is often around 75-80% of Open Circuit Voltage
         self.v_ref = 0.75 * config.v_oc_stc
         self.v_prev = self.v_ref
         self.p_prev = 0.0
 
     def get_mppt_power(self, g: float, dt: float, d_v: float = 0.1) -> float:
         """
-        Calculates MPPT power using Perturb & Observe algorithm.
+        Calculates MPPT power using the P&O algorithm.
+        
+        Args:
+            g: Solar irradiance in W/m^2
+            dt: Time step in seconds
+            d_v: Voltage perturbation step
         """
         # Solar panel model
         i_sc = self.config.i_sc_stc * (g / 1000.0)
@@ -36,14 +45,3 @@ class SolarEngine:
         self.p_prev = p_ref
         
         return p_ref * self.config.eta_mppt
-
-    def get_irradiance(self, t: float, env_config):
-        """
-        Calculates irradiance G based on time and environmental config.
-        """
-        # Linear ramp for G
-        # Assuming mission duration is t_total
-        # For simplicity, we'll need to know the total time or map t to a 0-1 range
-        # Let's assume t is in seconds
-        # This function might need more context or be handled by the orchestrator
-        pass

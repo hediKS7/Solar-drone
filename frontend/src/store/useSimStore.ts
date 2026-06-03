@@ -141,7 +141,8 @@ export const useSimStore = create<SimState>((set, get) => ({
   setLca: (config) => set((state) => ({ lca: { ...state.lca, ...config } })),
 
   runSimulation: async () => {
-    set({ loading: true });
+    // Prevent multiple simultaneous runs
+    if (get().loading) return;
     try {
       const { battery, solar, mission, environment, lca } = get();
       const response = await fetch('http://localhost:8000/simulate', {
