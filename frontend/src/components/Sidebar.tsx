@@ -50,7 +50,7 @@ export const Sidebar = () => {
                 <Slider 
                   value={[battery.nSeries]} 
                   min={1} max={12} step={1} 
-                  onValueChange={([v]) => setBattery({ nSeries: v })}
+                  onValueChange={(v) => setBattery({ nSeries: Array.isArray(v) ? v[0] : v })}
                 />
               </div>
               <div className="space-y-2">
@@ -61,7 +61,7 @@ export const Sidebar = () => {
                 <Slider 
                   value={[battery.nParallel]} 
                   min={1} max={10} step={1} 
-                  onValueChange={([v]) => setBattery({ nParallel: v })}
+                  onValueChange={(v) => setBattery({ nParallel: Array.isArray(v) ? v[0] : v })}
                 />
               </div>
               <div className="space-y-2">
@@ -99,7 +99,7 @@ export const Sidebar = () => {
                 <Slider 
                   value={[solar.etaPanel * 100]} 
                   min={5} max={40} step={1} 
-                  onValueChange={([v]) => setSolar({ etaPanel: v / 100 })}
+                  onValueChange={(v) => setSolar({ etaPanel: (Array.isArray(v) ? v[0] : v) / 100 })}
                 />
               </div>
             </CardContent>
@@ -157,7 +157,7 @@ export const Sidebar = () => {
                 <Slider 
                   value={[environment.gMin]} 
                   min={0} max={1000} step={50} 
-                  onValueChange={([v]) => setEnvironment({ gMin: v })}
+                  onValueChange={(v) => setEnvironment({ gMin: Array.isArray(v) ? v[0] : v })}
                 />
               </div>
               <div className="space-y-2">
@@ -165,7 +165,7 @@ export const Sidebar = () => {
                 <Slider 
                   value={[environment.gMax]} 
                   min={0} max={1200} step={50} 
-                  onValueChange={([v]) => setEnvironment({ gMax: v })}
+                  onValueChange={(v) => setEnvironment({ gMax: Array.isArray(v) ? v[0] : v })}
                 />
               </div>
               <div className="space-y-2">
@@ -173,7 +173,7 @@ export const Sidebar = () => {
                 <Slider 
                   value={[environment.cloudFactor * 100]} 
                   min={0} max={100} step={5} 
-                  onValueChange={([v]) => setEnvironment({ cloudFactor: v / 100 })}
+                  onValueChange={(v) => setEnvironment({ cloudFactor: (Array.isArray(v) ? v[0] : v) / 100 })}
                 />
               </div>
             </CardContent>
