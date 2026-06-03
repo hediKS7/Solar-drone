@@ -12,6 +12,10 @@ class BatteryConfig(BaseModel):
     r1: float = Field(0.010, alias="r1")
     c1: float = Field(2000.0, alias="c1")
 
+    model_config = {
+        "populate_by_name": True
+    }
+
 class SolarConfig(BaseModel):
     a_panel: float = Field(0.42, alias="aPanel")
     eta_panel: float = Field(0.20, alias="etaPanel")
@@ -19,10 +23,18 @@ class SolarConfig(BaseModel):
     v_oc_stc: float = Field(21.0, alias="vOcStc")
     i_sc_stc: float = Field(4.8, alias="iScStc")
 
+    model_config = {
+        "populate_by_name": True
+    }
+
 class MissionPhase(BaseModel):
     name: str
     duration_min: float = Field(..., alias="durationMin")
     power_w: float = Field(..., alias="powerW")
+
+    model_config = {
+        "populate_by_name": True
+    }
 
 class EnvironmentalConfig(BaseModel):
     g_min: float = Field(400, alias="gMin")
@@ -31,6 +43,10 @@ class EnvironmentalConfig(BaseModel):
     cloud_start_min: float = Field(25, alias="cloudStartMin")
     cloud_end_min: float = Field(30, alias="cloudEndMin")
 
+    model_config = {
+        "populate_by_name": True
+    }
+
 class LCAConfig(BaseModel):
     fe_grid: float = Field(0.58, alias="feGrid")
     fe_solar: float = Field(0.041, alias="feSolar")
@@ -38,6 +54,11 @@ class LCAConfig(BaseModel):
     ee_batterie: float = Field(250.0, alias="eeBatterie")
     fe_bat_mfg: float = Field(0.120, alias="feBatMfg")
     eta_charge: float = Field(0.90, alias="etaCharge")
+
+    model_config = {
+        "populate_by_name": True
+    }
+
 
 class SimulationRequest(BaseModel):
     battery: BatteryConfig

@@ -11,6 +11,16 @@ interface KPICardProps {
 }
 
 export const KPICard = ({ title, value, unit, icon: Icon, color = "solar" }: KPICardProps) => {
+  // Map color strings to actual Tailwind classes
+  const colorMap: Record<string, { bg: string, text: string }> = {
+    "solar": { bg: "bg-solar/10", text: "text-solar" },
+    "blue-500": { bg: "bg-blue-500/10", text: "text-blue-500" },
+    "green-500": { bg: "bg-green-500/10", text: "text-green-500" },
+    "emerald-500": { bg: "bg-emerald-500/10", text: "text-emerald-500" },
+  }
+  
+  const theme = colorMap[color] || colorMap["solar"]
+
   return (
     <Card className="overflow-hidden border-none bg-card/40 backdrop-blur-sm">
       <CardContent className="p-6 flex items-center justify-between">
@@ -21,8 +31,8 @@ export const KPICard = ({ title, value, unit, icon: Icon, color = "solar" }: KPI
             {unit && <span className="text-sm font-medium text-muted-foreground">{unit}</span>}
           </div>
         </div>
-        <div className={`p-3 rounded-xl bg-${color}/10`}>
-          <Icon className={`w-6 h-6 text-${color}`} />
+        <div className={`p-3 rounded-xl ${theme.bg}`}>
+          <Icon className={`w-6 h-6 ${theme.text}`} />
         </div>
       </CardContent>
     </Card>

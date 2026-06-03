@@ -134,28 +134,39 @@ export const useSimStore = create<SimState>((set, get) => ({
   result: null,
   loading: false,
 
-  setBattery: (config) => set((state) => ({ battery: { ...state.battery, ...config } })),
+  setBattery: (config) => set((state) => {
+    const newBattery = { ...state.battery, ...config };
+    // If nSeries changed, update the voltage thresholds automatically
+    if (config.nSeries !== undefined) {
+      newBattery.vNom = config.nSeries * 3.7;
+      newBattery.vMax = config.nSeries * 4.2;
+      newBattery.vMin = config.nSeries * 3.0;
+    }
+    return { battery: newBattery };
+  }),
   setSolar: (config) => set((state) => ({ solar: { ...state.solar, ...config } })),
   setMission: (mission) => set({ mission }),
   setEnvironment: (config) => set((state) => ({ environment: { ...state.environment, ...config } })),
   setLca: (config) => set((state) => ({ lca: { ...state.lca, ...config } })),
 
   runSimulation: async () => {
-    // Prevent multiple simultaneous runs
     const state = get();
-    if (state.loading) return;
-
+    // Use a small delay or check to ensure we don't spam, 
+    // but the debounce in page.tsx already handles most of this.
+    
     set({ loading: true });
     try {
       const { battery, solar, mission, environment, lca } = state;
+      const payload = { battery, solar, mission, environment, lca };
       
-      // Use relative URL or environment variable for flexibility
+      console.log('Running Simulation with payload:', payload);
+      
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       
       const response = await fetch(`${baseUrl}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ battery, solar, mission, environment, lca }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -164,7 +175,9 @@ export const useSimStore = create<SimState>((set, get) => ({
       }
 
       const data = await response.json();
-      set({ result: data, loading: false });
+      // Add a timestamp to force update if needed, though Zustand handles object changes
+      set({ result: { ...data, _ts: Date.now() }, loading: false });
+      console.log('Simulation complete. Results updated.');
     } catch (error) {
       console.error('Simulation Error:', error);
       set({ loading: false });

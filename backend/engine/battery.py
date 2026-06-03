@@ -6,14 +6,18 @@ class BatteryEngine:
     def __init__(self, config: BatteryConfig):
         self.config = config
         
-        # Table OCV vs SoC (from notebook)
+        # Base OCV per cell (interpolated from 3.0V to 4.2V)
         self.soc_table = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.5,
                                    0.6, 0.7, 0.8, 0.9, 1.0])
-        self.ocv_table = np.array([12.0, 12.8, 13.2, 13.6, 13.9, 14.2,
-                                   14.5, 14.8, 15.2, 15.8, 16.8])
+        # Per-cell OCV values
+        self.ocv_table_per_cell = np.array([3.0, 3.2, 3.3, 3.4, 3.475, 3.55,
+                                            3.625, 3.7, 3.8, 3.95, 4.2])
+        
+        # Scale for the whole pack
+        self.ocv_table = self.ocv_table_per_cell * self.config.n_series
         
         self.ocv_interp = interp1d(self.soc_table, self.ocv_table, kind='cubic',
-                                   bounds_error=False, fill_value=(12.0, 16.8))
+                                   bounds_error=False, fill_value=(self.ocv_table[0], self.ocv_table[-1]))
 
     def get_ocv(self, soc: float) -> float:
         return float(self.ocv_interp(np.clip(soc, 0, 1)))

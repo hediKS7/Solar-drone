@@ -22,10 +22,12 @@ def health_check():
 @app.post("/simulate", response_model=SimulationResponse)
 def simulate(request: SimulationRequest):
     try:
+        print(f"Received Simulation Request: Battery S={request.battery.n_series}, P={request.battery.n_parallel}, Capacity={request.battery.q_nom}Ah")
         simulator = DroneSimulator(request)
         result = simulator.run()
         return result
     except Exception as e:
+        print(f"Simulation Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
