@@ -1,0 +1,49 @@
+import numpy as np
+from backend.models.schemas import SolarConfig
+
+class SolarEngine:
+    def __init__(self, config: SolarConfig):
+        self.config = config
+        self.v_ref = 0.75 * config.v_oc_stc
+        self.v_prev = self.v_ref
+        self.p_prev = 0.0
+
+    def get_mppt_power(self, g: float, dt: float, d_v: float = 0.1) -> float:
+        """
+        Calculates MPPT power using Perturb & Observe algorithm.
+        """
+        # Solar panel model
+        i_sc = self.config.i_sc_stc * (g / 1000.0)
+        v_oc = self.config.v_oc_stc * (1 + 0.00025 * (g - 1000))
+        
+        # Current at V_ref (simplified linear/polynomial model)
+        i_ref = i_sc * (1 - (self.v_ref / v_oc)**2.5)
+        i_ref = max(0, i_ref)
+        p_ref = self.v_ref * i_ref
+        
+        # P&O Logic
+        dp = p_ref - self.p_prev
+        dv_sign = np.sign(self.v_ref - self.v_prev)
+        
+        if dp > 0:
+            self.v_ref += d_v * dv_sign if dv_sign != 0 else d_v
+        elif dp < 0:
+            self.v_ref -= d_v * dv_sign if dv_sign != 0 else d_v
+            
+        self.v_ref = np.clip(self.v_ref, 0.3 * v_oc, 0.95 * v_oc)
+        
+        self.v_prev = self.v_ref
+        self.p_prev = p_ref
+        
+        return p_ref * self.config.eta_mppt
+
+    def get_irradiance(self, t: float, env_config):
+        """
+        Calculates irradiance G based on time and environmental config.
+        """
+        # Linear ramp for G
+        # Assuming mission duration is t_total
+        # For simplicity, we'll need to know the total time or map t to a 0-1 range
+        # Let's assume t is in seconds
+        # This function might need more context or be handled by the orchestrator
+        pass
