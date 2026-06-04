@@ -256,9 +256,13 @@ export const Dashboard = () => {
               ) : aiAnalysis ? (
                 <motion.div 
                   key="analysis"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="prose prose-invert prose-sm max-w-none prose-headings:text-solar prose-headings:mb-2 prose-headings:mt-4 prose-p:text-white/80 prose-p:leading-relaxed prose-strong:text-white"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="prose prose-invert prose-sm max-w-none 
+                    prose-headings:text-solar prose-headings:mb-1 prose-headings:mt-3 
+                    prose-p:text-white/70 prose-p:leading-snug prose-li:text-white/70
+                    prose-strong:text-solar prose-strong:font-bold
+                    bg-white/5 p-4 rounded-xl border border-white/5 shadow-inner"
                 >
                   <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
                 </motion.div>

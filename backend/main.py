@@ -61,12 +61,14 @@ Analyze the following simulation results and provide technical feedback.
 - CO2 Reduction: {res.lca_metrics.reduction_pct}%
 
 ### INSTRUCTIONS:
-Provide a concise analysis in Markdown format. Include:
-1. **Executive Summary**: A brief overview of the mission's success.
-2. **Technical Insights**: Analysis of the power balance and battery health.
-3. **Optimization Tips**: 2-3 specific suggestions to improve performance or sustainability.
+Provide a **very concise** technical analysis. Use bullet points and bold text for readability.
+Max total length: 150 words.
+Structure:
+1. **Summary**: One sentence on mission success.
+2. **Key Findings**: 2-3 bullet points on energy/battery health.
+3. **Action Items**: 2 bullet points for optimization.
 
-Keep the tone professional, technical, and encouraging. Use icons where appropriate.
+Keep the tone expert, direct, and elite. Use minimal icons.
 """
 
         url = "https://api.mistral.ai/v1/chat/completions"
