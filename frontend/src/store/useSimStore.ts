@@ -170,7 +170,7 @@ export const useSimStore = create<SimState>((set, get) => ({
       const { battery, solar, mission, environment, lca } = state;
       const payload = { battery, solar, mission, environment, lca };
       
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const baseUrl = '/api';
       const response = await fetch(`${baseUrl}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -204,7 +204,7 @@ export const useSimStore = create<SimState>((set, get) => ({
         results: result
       };
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const baseUrl = '/api';
       const response = await fetch(`${baseUrl}/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
